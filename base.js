@@ -1,8 +1,8 @@
 var canvas = document.getElementById('map');
 var ctx = canvas.getContext("2d");
 
-var zoom = 7;
-var levels = 255/5;
+var zoom = 5;
+var levels = 255/8;
 
 noise.seed(Math.random());
 for (var x = 0; x < canvas.width; x++) {
