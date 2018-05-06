@@ -16,7 +16,7 @@ for (var x = 0; x < canvas.width; x++) {
         var h, s, l;
         var elevation = noise.simplex2(0.004 * x, 0.004 * y);
         elevation += 0.2 * noise.simplex2(0.02 * x, 0.02 * y);
-        elevation += 0.05 * noise.simplex2(0.08 * x, 0.08 * y);
+        elevation += 0.05 * noise.simplex2(0.04 * x, 0.04 * y);
 
         elevation = (elevation +1) / 2;
 
