@@ -58,6 +58,10 @@ function initMap() {
         this.tileSize = tileSize;
     }
 }
+/**
+ * Returns default tile size
+ * @returns {obj} Tilesize object (x and y)
+ */
 function getTileSize(){
     var tileSize = {
         x: 256,
@@ -65,6 +69,7 @@ function getTileSize(){
     }
     return tileSize;
 }
+
 /**
  * Normalizes the coords that tiles repeat across the x axis (horizontally) like the standard Google map tiles.
  * @param   {object} The  coordinate of the tile
@@ -84,9 +89,9 @@ function getNormalizedCoord(coord, zoom) {
         return null;
     }
 
-    // repeat across x-axis
+    // dont repeat across x-axis
     if (x < 0 || x >= tileRange) {
-        x = (x % tileRange + tileRange) % tileRange;
+        return null;
     }
 
     return {x: x, y: y};
@@ -111,8 +116,8 @@ function generateCanvas(canvas, coord, zoom){
     for (var x = 0; x < canvas.width; x++) {
         for (var y = 0; y < canvas.height; y++) {
             // Adjusting x and y coordinates to tiled versions
-            var cX = x + (getTileSize.x * (coord.x + 1));
-            var cY = y + (getTileSize.y * (coord.y + 1));
+            var cX = x + (getTileSize().x * (coord.x + 1));
+            var cY = y + (getTileSize().y * (coord.y + 1));
             var h, s, l;
             // All noise functions return values in the range of -1 to 1.
             var elevation = noise.simplex2(0.004 * cX, 0.004 * cY);
