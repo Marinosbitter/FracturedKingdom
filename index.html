@@ -5,11 +5,6 @@
         <meta name="viewport" content="initial-scale=1.0">
         <meta charset="utf-8">
         <style>
-            /* Always set the map height explicitly to define the size of the div
-            * element that contains the map. */
-            #map {
-                height: 100%;
-            }
             /* Optional: Makes the sample page fill the window. */
             html, body {
                 height: 100%;
@@ -19,16 +14,68 @@
         </style>
     </head>
     <body>
-        <div id="map"></div>
-        <script src="noise/perlin.js"></script>
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-                crossorigin="anonymous"></script>
-        <script style="/js/tiles.js"></script>
-        <script src="base.js"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDRKbMydVJQ1a9InfUngDiyTG0O3v7qWrA&callback=initMap"
-                async 
-                defer>
-        </script>
+        <div id="container"></div>
     </body>
+
+    <script>
+        var container,
+            renderer,
+            scene,
+            camera,
+            mesh,
+            start = Date.now(),
+            fov = 30;
+
+        window.addEventListener( 'load', function() {
+            //======================== Actual program ==============================//
+            // grab the container from the DOM
+            container = document.getElementById( "container" );
+
+            // create a scene
+            scene = new THREE.Scene();
+
+            // create a camera the size of the browser window
+            // and place it 100 units away, looking towards the center of the scene
+            camera = new THREE.PerspectiveCamera(
+                fov,
+                window.innerWidth / window.innerHeight,
+                1,
+                10000
+            );
+            camera.position.z = 100;
+
+            // create a wireframe material
+            material = new THREE.ShaderMaterial( {
+                vertexShader: document.getElementById( 'vertexShader' ).textContent,
+                fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+            } );
+
+            // create a sphere and assign the material
+            mesh = new THREE.Mesh(
+                new THREE.IcosahedronGeometry( 20, 4 ),
+                material
+            );
+            scene.add( mesh );
+
+            // create the renderer and attach it to the DOM
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            renderer.setPixelRatio( window.devicePixelRatio );
+
+            container.appendChild( renderer.domElement );
+
+            render();
+        } );
+
+        function render() {
+
+            // let there be light
+            renderer.render( scene, camera );
+            requestAnimationFrame( render );
+
+        }
+    </script>
+    <script type="x-shader/x-vertex" id="vertexShader" src="js/shaders/vertexShader.js"></script>
+    <script type="x-shader/x-fragment" id="fragmentShader" src="js/shaders/fragmentShader.js"></script>
+    <script src="libraries/threejs/three.js"></script>
 </html>
