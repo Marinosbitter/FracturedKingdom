@@ -17,7 +17,8 @@ var mapVariables = {
             freqModX: 4,
             freqModY: 2
         }
-    }
+    },
+    redistribution: 1
 }
 
 
@@ -34,7 +35,8 @@ for (var x = 0; x < canvas.width; x++) {
             value += mapVariables.octaves[i].weight * noise.simplex2(mapVariables.octaves[i].freqModX * mapVariables.frequency * x, mapVariables.octaves[i].freqModY * mapVariables.frequency * y);
         }
         value = (value+1)/2;
-
+        value = Math.pow(value, mapVariables.redistribution);
+        
         ctx.fillStyle = "rgba(0, 0, 0, "+value+")";
 
         if(value <= 0){
