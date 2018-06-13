@@ -2,6 +2,8 @@
  * Initialiezes the Google map
  * @returns {string} Google map object
  */
+var TILE_SIZE = 256;
+
 function initMap() {
     var map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 0, lng: 0},
@@ -26,7 +28,7 @@ function initMap() {
         canvas.style.borderStyle = 'solid';
         canvas.style.borderWidth = '1px';
         canvas.style.borderColor = '#AAAAAA';
-        canvas = generateCanvas(canvas, normalizedCoord, zoom);
+        canvas = generateCanvas(map, canvas, normalizedCoord, zoom);
         return canvas;
     };
 
@@ -38,11 +40,11 @@ function initMap() {
                 return null;
             }
             var bound = Math.pow(2, zoom);
-            return '//via.placeholder.com/256x256?text=Z:+' + 
+            return '//via.placeholder.com/' + TILE_SIZE + 'x' + TILE_SIZE + '?text=Z:+' + 
                 zoom + '+X:+' + normalizedCoord.x + '+Y:+' +
                 (bound - normalizedCoord.y - 1);
         },
-        tileSize: new google.maps.Size(256, 256),
+        tileSize: new google.maps.Size(TILE_SIZE, TILE_SIZE),
         maxZoom: 9,
         minZoom: 0,
         name: 'Fractured Kingdom'
@@ -51,23 +53,12 @@ function initMap() {
     map.mapTypes.set('fractured', fracturedMapType);
     map.setMapTypeId('fractured');
     map.overlayMapTypes.insertAt(
-        0, new CoordMapType(new google.maps.Size(256, 256)));
+        0, new CoordMapType(new google.maps.Size(TILE_SIZE, TILE_SIZE)));
 
     // Helper functions
     function CoordMapType(tileSize) {
         this.tileSize = tileSize;
     }
-}
-/**
- * Returns default tile size
- * @returns {obj} Tilesize object (x and y)
- */
-function getTileSize(){
-    var tileSize = {
-        x: 256,
-        y: 256
-    }
-    return tileSize;
 }
 
 /**
@@ -89,9 +80,9 @@ function getNormalizedCoord(coord, zoom) {
         return null;
     }
 
-    // dont repeat across x-axis
+    // repeat across x-axis
     if (x < 0 || x >= tileRange) {
-        return null;
+        x = (x % tileRange + tileRange) % tileRange;
     }
 
     return {x: x, y: y};
@@ -104,20 +95,33 @@ function getNormalizedCoord(coord, zoom) {
  * @param   {number} zoom   Zoom level of the ma[]
  * @returns {canvas} The painted canvas
  */
-function generateCanvas(canvas, coord, zoom){
+function generateCanvas(map, canvas, coord, zoom){
     var ctx = canvas.getContext("2d");
 
     var levels = 20;
     levels = 12;
 
     var waterLevel = 0.3;
+    var pixel = {
+        x:20,
+        y:30
+    };
     
+    console.info(noise.simplex2(37.3957408, 5.9891252));
+    
+
     noise.seed(43);
     for (var x = 0; x < canvas.width; x++) {
         for (var y = 0; y < canvas.height; y++) {
+            var pixLL = point2LatLng({x:x, y:y}, map);
+//            console.info(pixLL.lat());
             // Adjusting x and y coordinates to tiled versions
-            var cX = x + (getTileSize().x * (coord.x + 1));
-            var cY = y + (getTileSize().y * (coord.y + 1));
+            
+//            var cX = x + (TILE_SIZE * (coord.x + 1));
+//            var cY = y + (TILE_SIZE * (coord.y + 1));
+            var cX = pixLL.lat();
+            var cY = pixLL.lng();
+            
             var h, s, l;
             // All noise functions return values in the range of -1 to 1.
             var elevation = noise.simplex2(0.004 * cX, 0.004 * cY);
@@ -141,4 +145,20 @@ function generateCanvas(canvas, coord, zoom){
         }
     }
     return canvas;
+}
+
+function latLng2Point(latLng, map) {
+  var topRight = map.getProjection().fromLatLngToPoint(map.getBounds().getNorthEast());
+  var bottomLeft = map.getProjection().fromLatLngToPoint(map.getBounds().getSouthWest());
+  var scale = Math.pow(2, map.getZoom());
+  var worldPoint = map.getProjection().fromLatLngToPoint(latLng);
+  return new google.maps.Point((worldPoint.x - bottomLeft.x) * scale, (worldPoint.y - topRight.y) * scale);
+}
+
+function point2LatLng(point, map) {
+  var topRight = map.getProjection().fromLatLngToPoint(map.getBounds().getNorthEast());
+  var bottomLeft = map.getProjection().fromLatLngToPoint(map.getBounds().getSouthWest());
+  var scale = Math.pow(2, map.getZoom());
+  var worldPoint = new google.maps.Point(point.x / scale + bottomLeft.x, point.y / scale + topRight.y);
+  return map.getProjection().fromPointToLatLng(worldPoint);
 }
