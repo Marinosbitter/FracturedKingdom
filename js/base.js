@@ -41,8 +41,12 @@ var normalizer = 0;
 for (i = 0; i < count; i++){
     normalizer += mapVariables.baseMap.octaves[i].weight;
 }
-for (var x = 0; x < canvas.width; x++) {
-    for (var y = 0; y < canvas.height; y++) {
+
+var coordSystem = {
+    resolution: 1
+}
+for (var x = 0; x < 360; x += coordSystem.resolution) {
+    for (var y = 0; y < 360; y += coordSystem.resolution) {
         var coordData = {
             coordHeight: 0
         };
@@ -66,4 +70,5 @@ for (var x = 0; x < canvas.width; x++) {
         }
         ctx.fillRect(x,y,1,1);
     }
+    console.info(x);
 }
