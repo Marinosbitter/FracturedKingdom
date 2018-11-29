@@ -1,0 +1,27 @@
+{
+    "name": "fracturedkingdom",
+    "version": "1.0.0",
+    "description": "A World Generator",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "parcel src/index.html",
+        "build": "parcel build --public-url . src/index.html"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Marinosbitter/FracturedKingdom.git"
+    },
+    "author": "Marinos",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Marinosbitter/FracturedKingdom/issues"
+    },
+    "homepage": "https://github.com/Marinosbitter/FracturedKingdom#readme",
+    "devDependencies": {
+        "parcel-bundler": "^1.10.3"
+    },
+    "dependencies": {
+        "ol": "^5.3.0"
+    }
+}
